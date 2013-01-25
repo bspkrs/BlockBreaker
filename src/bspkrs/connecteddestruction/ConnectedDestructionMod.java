@@ -25,12 +25,12 @@ import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.PlayerControllerMP;
 import net.minecraftforge.common.Configuration;
 
-@Mod(modid="ConnectedDestruction", version = "1.4.2.r01", useMetadata=true)
+@Mod(modid="ConnectedDestruction", version = "1.4.6.r01", useMetadata=true)
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
 public class ConnectedDestructionMod
 {
     private static ModVersionChecker versionChecker;
-    private String versionURL = "https://dl.dropbox.com/u/20748481/Minecraft/1.4.2/connectedDestructionForge.version";
+    private String versionURL = "https://dl.dropbox.com/u/20748481/Minecraft/1.4.6/connectedDestruction.version";
     private String mcfTopic = "http://www.minecraftforum.net/topic/1009577-";
 
     @SideOnly(Side.CLIENT)
