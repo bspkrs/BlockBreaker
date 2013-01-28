@@ -1,4 +1,4 @@
-package bspkrs.treecapitator.fml.asm;
+package bspkrs.blockbreaker.asm;
 
 /*
  * Invaluable help from AtomicStryker's MultiMine coremod code <3
@@ -28,8 +28,8 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import bspkrs.treecapitator.TCLog;
-import bspkrs.treecapitator.fml.TreeCapitatorMod;
+import bspkrs.blockbreaker.BBLog;
+import bspkrs.blockbreaker.BlockBreakerMod;
 import cpw.mods.fml.relauncher.IClassTransformer;
 
 public class ItemInWorldManagerTransformer implements IClassTransformer
@@ -194,8 +194,8 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
     
     private byte[] transformItemInWorldManager(byte[] bytes, HashMap hm)
     {
-        TCLog.info("TreeCapitator ASM Magic Time!");
-        TCLog.info("Class Transformation running on " + hm.get("javaClassName") + "...");
+        BBLog.info("TreeCapitator ASM Magic Time!");
+        BBLog.info("Class Transformation running on " + hm.get("javaClassName") + "...");
         
         ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(bytes);
@@ -208,7 +208,7 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
             MethodNode m = methods.next();
             if (m.name.equals(hm.get("targetMethodName")) && m.desc.equals(targetMethodDesc))
             {
-                TCLog.info("Found target method " + m.name + m.desc + "! Searching for landmarks...");
+                BBLog.info("Found target method " + m.name + m.desc + "! Searching for landmarks...");
                 int blockIndex = 4;
                 int mdIndex = 5;
                 
@@ -227,10 +227,10 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                             int offset = 1;
                             while (m.instructions.get(index + offset).getOpcode() != ASTORE)
                                 offset++;
-                            TCLog.info("Found Block object ASTORE Node at " + (index + offset));
+                            BBLog.info("Found Block object ASTORE Node at " + (index + offset));
                             VarInsnNode blockNode = (VarInsnNode) m.instructions.get(index + offset);
                             blockIndex = blockNode.var;
-                            TCLog.info("Block object is in local object " + blockIndex);
+                            BBLog.info("Block object is in local object " + blockIndex);
                         }
                     }
                     
@@ -244,23 +244,23 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                             int offset = 1;
                             while (m.instructions.get(index + offset).getOpcode() != ISTORE)
                                 offset++;
-                            TCLog.info("Found metadata local variable ISTORE Node at " + (index + offset));
+                            BBLog.info("Found metadata local variable ISTORE Node at " + (index + offset));
                             VarInsnNode mdFieldNode = (VarInsnNode) m.instructions.get(index + offset);
                             mdIndex = mdFieldNode.var;
-                            TCLog.info("Metadata is in local variable " + mdIndex);
+                            BBLog.info("Metadata is in local variable " + mdIndex);
                         }
                     }
                     
                     if (m.instructions.get(index).getOpcode() == IFNULL)
                     {
-                        TCLog.info("Found IFNULL Node at " + index);
+                        BBLog.info("Found IFNULL Node at " + index);
                         
                         int offset = 1;
                         while (m.instructions.get(index + offset).getOpcode() != ALOAD)
                             offset++;
                         
-                        TCLog.info("Found ALOAD Node at offset " + offset + " from IFNULL Node");
-                        TCLog.info("Patching method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + "...");
+                        BBLog.info("Found ALOAD Node at offset " + offset + " from IFNULL Node");
+                        BBLog.info("Patching method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + "...");
                         
                         // make a new label node for the end of our code
                         LabelNode lmm1Node = new LabelNode(new Label());
@@ -269,7 +269,7 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                         InsnList toInject = new InsnList();
                         
                         // construct instruction nodes for list
-                        toInject.add(new FieldInsnNode(GETSTATIC, "bspkrs/treecapitator/fml/TreeCapitatorMod", "instance", "Lbspkrs/treecapitator/fml/TreeCapitatorMod;"));
+                        toInject.add(new FieldInsnNode(GETSTATIC, "bspkrs/blockbreaker/BlockBreakerMod", "instance", "Lbspkrs/blockbreaker/BlockBreakerMod;"));
                         toInject.add(new VarInsnNode(ALOAD, 0));
                         toInject.add(new FieldInsnNode(GETFIELD, (String) hm.get("javaClassName"), (String) hm.get("worldFieldName"), "L" + (String) hm.get("worldJavaClassName") + ";"));
                         toInject.add(new VarInsnNode(ILOAD, 1));
@@ -279,16 +279,16 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                         toInject.add(new VarInsnNode(ILOAD, mdIndex));
                         toInject.add(new VarInsnNode(ALOAD, 0));
                         toInject.add(new FieldInsnNode(GETFIELD, (String) hm.get("javaClassName"), (String) hm.get("entityPlayerFieldName"), "L" + (String) hm.get("entityPlayerMPJavaClassName") + ";"));
-                        toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "bspkrs/treecapitator/fml/TreeCapitatorMod", "onBlockHarvested",
+                        toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "bspkrs/blockbreaker/BlockBreakerMod", "onBlockHarvested",
                                 "(L" + (String) hm.get("worldJavaClassName") + ";IIIL" + (String) hm.get("blockJavaClassName") + ";IL"
                                         + (String) hm.get("entityPlayerJavaClassName") + ";)V"));
                         toInject.add(lmm1Node);
                         
                         m.instructions.insertBefore(m.instructions.get(index + offset), toInject);
                         
-                        TCLog.info("Method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + " patched at index " + (index + offset - 1));
-                        TCLog.info("TreeCapitator ASM Patching Complete!");
-						TreeCapitatorMod.instance.isCoreModLoaded = true;
+                        BBLog.info("Method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + " patched at index " + (index + offset - 1));
+                        BBLog.info("TreeCapitator ASM Patching Complete!");
+                        BlockBreakerMod.instance.isCoreModLoaded = true;
                         break;
                     }
                 }
