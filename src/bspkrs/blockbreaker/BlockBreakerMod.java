@@ -38,7 +38,7 @@ import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 public class BlockBreakerMod
 {
     public static ModVersionChecker versionChecker;
-    private String                  versionURL      = "https://dl.dropbox.com/u/20748481/Minecraft/1.4.6/connectedDestruction.version";
+    private String                  versionURL      = "https://dl.dropbox.com/u/20748481/Minecraft/1.4.6/blockBreakerForge.version";
     private String                  mcfTopic        = "http://www.minecraftforum.net/topic/1009577-";
     
     public ModMetadata              metadata;
