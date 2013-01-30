@@ -121,7 +121,7 @@ public class BlockBreakerMod
                         if (CommonUtils.isMetadataNull(blockID.id, BBSettings.blockGroups))
                             blockID = new BlockID(blockID.id);
                         
-                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.drops == 2);
+                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode == 2);
                         cd.harvestConnectedBlocks(x, y, z);
                     }
                 }
@@ -132,7 +132,7 @@ public class BlockBreakerMod
                         if (CommonUtils.isMetadataNull(blockID.id, BBSettings.blockGroups))
                             blockID = new BlockID(blockID.id);
                         
-                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.drops > 0);
+                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode > 0);
                         cd.harvestConnectedBlocks(x, y, z);
                     }
                 }
