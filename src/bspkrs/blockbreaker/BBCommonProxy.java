@@ -1,6 +1,6 @@
 package bspkrs.blockbreaker;
 
-public class CommonProxy
+public class BBCommonProxy
 {
     public void onLoad()
     {}

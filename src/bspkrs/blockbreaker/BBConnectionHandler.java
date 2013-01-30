@@ -8,7 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import cpw.mods.fml.common.network.IConnectionHandler;
 import cpw.mods.fml.common.network.Player;
 
-public class ConnectionHandler implements IConnectionHandler
+public class BBConnectionHandler implements IConnectionHandler
 {
     @Override
     public void playerLoggedIn(Player player, NetHandler netHandler, INetworkManager manager)
@@ -35,6 +35,6 @@ public class ConnectionHandler implements IConnectionHandler
     @Override
     public void clientLoggedIn(NetHandler clientHandler, INetworkManager manager, Packet1Login login)
     {
-        BlockBreakerClient.instance.onClientConnect();
+        BBClient.instance.onClientConnect();
     }
 }

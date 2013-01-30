@@ -24,7 +24,7 @@ public enum BBLog
         if (logger != null)
             return;
         
-        logger = Logger.getLogger("TreeCapitator");
+        logger = Logger.getLogger("BlockBreaker");
         logger.setParent(ModLoader.getLogger());
     }
     

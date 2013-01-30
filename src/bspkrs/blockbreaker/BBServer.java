@@ -4,11 +4,11 @@ import bspkrs.fml.util.ForgePacketHelper;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 
-public class BlockBreakerServer
+public class BBServer
 {
-    public static BlockBreakerServer instance;
+    public static BBServer instance;
     
-    public BlockBreakerServer()
+    public BBServer()
     {
         instance = this;
     }

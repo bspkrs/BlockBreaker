@@ -21,7 +21,7 @@ public class BlockBreaker
 {
     
     private final int       LIMIT           = BBSettings.blockLimit;
-    private final int       MAX_DISTANCE    = BBSettings.maximumDistance;
+    private final int       MAX_DISTANCE    = BBSettings.maxDistance;
     private final int       BLOCKS_PER_TICK = BBSettings.blocksPerTick;
     public int              blocksHarvested;
     private boolean         enableDrops;
@@ -54,6 +54,9 @@ public class BlockBreaker
         return res;
     }
     
+    /*
+     * Breaks all the
+     */
     public void harvestConnectedBlocks(int x, int y, int z)
     {
         byte d = 1;
@@ -68,16 +71,17 @@ public class BlockBreaker
                     
                     Coord blockPos = new Coord(x + dx, y + dy, z + dz);
                     int id = world.getBlockId(blockPos.x, blockPos.y, blockPos.z);
+                    
+                    Block block = Block.blocksList[id];
+                    if (block == null)
+                        continue;
+                    
                     int metadata = world.getBlockMetadata(blockPos.x, blockPos.y, blockPos.z);
                     if (id == blockID.id && (blockID.metadata == -1 || blockID.metadata == metadata))
                     {
                         if ((LIMIT == -1 || blocksHarvested <= LIMIT) && (MAX_DISTANCE == -1
                                 || getSphericalDistance(blockPos.x, blockPos.y, blockPos.z) <= MAX_DISTANCE))
                         {
-                            Block block = Block.blocksList[id];
-                            if (block == null)
-                                continue;
-                            
                             if (world.blockHasTileEntity(blockPos.x, blockPos.y, blockPos.z))
                                 world.removeBlockTileEntity(blockPos.x, blockPos.y, blockPos.z);
                             world.setBlockWithNotify(blockPos.x, blockPos.y, blockPos.z, 0);
@@ -144,7 +148,7 @@ public class BlockBreaker
     
     private int getSphericalDistance(int x, int y, int z)
     {
-        return (int) Math.round(Math.sqrt(CommonUtils.sqr(x - startingPos.x) + CommonUtils.sqr(z - startingPos.z) + (y - startingPos.y)));
+        return (int) Math.round(Math.sqrt(CommonUtils.sqr(x - startingPos.x) + CommonUtils.sqr(z - startingPos.z) + CommonUtils.sqr(y - startingPos.y)));
     }
     
     private int getDistance(int x, int y, int z)

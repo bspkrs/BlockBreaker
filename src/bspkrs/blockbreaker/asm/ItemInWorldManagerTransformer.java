@@ -194,7 +194,7 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
     
     private byte[] transformItemInWorldManager(byte[] bytes, HashMap hm)
     {
-        BBLog.info("TreeCapitator ASM Magic Time!");
+        BBLog.info("BlockBreaker ASM Magic Time!");
         BBLog.info("Class Transformation running on " + hm.get("javaClassName") + "...");
         
         ClassNode classNode = new ClassNode();
@@ -287,7 +287,7 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                         m.instructions.insertBefore(m.instructions.get(index + offset), toInject);
                         
                         BBLog.info("Method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + " patched at index " + (index + offset - 1));
-                        BBLog.info("TreeCapitator ASM Patching Complete!");
+                        BBLog.info("BlockBreaker ASM Patching Complete!");
                         BlockBreakerMod.instance.isCoreModLoaded = true;
                         break;
                     }

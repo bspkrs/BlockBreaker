@@ -3,13 +3,16 @@ package bspkrs.blockbreaker;
 import bspkrs.fml.util.ForgePacketHelper;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockBreakerClient
+@SideOnly(Side.CLIENT)
+public class BBClient
 {
-    public static BlockBreakerClient instance;
-    public boolean                   serverDetected;
+    public static BBClient instance;
+    public boolean         serverDetected;
     
-    public BlockBreakerClient()
+    public BBClient()
     {
         instance = this;
         serverDetected = false;
