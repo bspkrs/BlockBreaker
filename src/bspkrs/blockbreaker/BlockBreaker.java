@@ -35,7 +35,7 @@ public class BlockBreaker
     public BlockBreaker(World world, BlockID blockData, int x, int y, int z, boolean enableDrops)
     {
         this.world = world;
-        TickRegistry.registerTickHandler(new BBTicker(EnumSet.of(TickType.WORLD)), Side.SERVER);
+        TickRegistry.registerTickHandler(new BBTicker(EnumSet.of(TickType.SERVER)), Side.SERVER);
         this.enableDrops = enableDrops;
         blocksHarvested = 0;
         scheduledBlocks = new ArrayList<Coord>();

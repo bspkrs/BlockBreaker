@@ -5,8 +5,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.EnumGameType;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeHooks;
 import bspkrs.util.BlockID;
 import bspkrs.util.CommonUtils;
@@ -17,6 +17,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.IMCCallback;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.Mod.Metadata;
 import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.Mod.ServerStarted;
@@ -41,7 +42,8 @@ public class BlockBreakerMod
     private String                  versionURL      = "https://dl.dropbox.com/u/20748481/Minecraft/1.4.6/blockBreakerForge.version";
     private String                  mcfTopic        = "http://www.minecraftforum.net/topic/1009577-";
     
-    public ModMetadata              metadata;
+    @Metadata(value = "BlockBreaker")
+    public static ModMetadata       metadata;
     
     // Gets set in the Class Transformer
     public static boolean           isCoreModLoaded = false;
@@ -63,12 +65,12 @@ public class BlockBreakerMod
     public void preInit(FMLPreInitializationEvent event)
     {
         metadata = event.getModMetadata();
-        BBSettings.loadConfig(new Configuration(event.getSuggestedConfigurationFile()));
+        BBSettings.loadConfig(event.getSuggestedConfigurationFile());
         
         if (BBSettings.allowUpdateCheck)
         {
             versionChecker = new ModVersionChecker(metadata.name, metadata.version, versionURL, mcfTopic, FMLLog.getLogger());
-            versionChecker.checkVersionWithLogging();
+            versionChecker.checkVersionWithLoggingBySubStringAsFloat(metadata.version.length() - 1, metadata.version.length());
         }
     }
     
@@ -111,28 +113,31 @@ public class BlockBreakerMod
             BlockID blockID = new BlockID(block, metadata);
             
             ItemStack item = player.getCurrentEquippedItem();
-            boolean canHarvestBlock = ForgeHooks.canHarvestBlock(block, player, metadata) && isBreakingEnabled(player);
-            if (!world.isRemote)
+            boolean canHarvestBlock = ForgeHooks.canHarvestBlock(block, player, metadata);
+            if (!world.isRemote && CommonUtils.isBlockInGroups(new int[] { blockID.id, metadata }, BBSettings.blockGroups) && isBreakingEnabled(player))
             {
+                if (CommonUtils.isMetadataNull(blockID.id, BBSettings.blockGroups))
+                    blockID = new BlockID(blockID.id);
+                
                 if (player.capabilities.isCreativeMode)
                 {
-                    if (canHarvestBlock && CommonUtils.isBlockInGroups(new int[] { blockID.id, metadata }, BBSettings.blockGroups))
+                    BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode >= 2);
+                    cd.harvestConnectedBlocks(x, y, z);
+                }
+                else if (world.getWorldInfo().getGameType().equals(EnumGameType.ADVENTURE))
+                {
+                    if (canHarvestBlock)
                     {
-                        if (CommonUtils.isMetadataNull(blockID.id, BBSettings.blockGroups))
-                            blockID = new BlockID(blockID.id);
-                        
-                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode == 2);
+                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode == 3);
                         cd.harvestConnectedBlocks(x, y, z);
                     }
                 }
                 else
+                // Survival
                 {
-                    if (canHarvestBlock && CommonUtils.isBlockInGroups(new int[] { blockID.id, metadata }, BBSettings.blockGroups))
+                    if (canHarvestBlock)
                     {
-                        if (CommonUtils.isMetadataNull(blockID.id, BBSettings.blockGroups))
-                            blockID = new BlockID(blockID.id);
-                        
-                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode > 0);
+                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode >= 1);
                         cd.harvestConnectedBlocks(x, y, z);
                     }
                 }

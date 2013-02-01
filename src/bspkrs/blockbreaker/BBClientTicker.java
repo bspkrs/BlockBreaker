@@ -57,7 +57,7 @@ public class BBClientTicker implements ITickHandler
         if (mcClient != null && mcClient.thePlayer != null)
         {
             if (BBSettings.allowUpdateCheck && BlockBreakerMod.versionChecker != null)
-                if (!BlockBreakerMod.versionChecker.isCurrentVersionBySubStringNewer(BlockBreakerMod.instance.metadata.version.length() - 1, BlockBreakerMod.instance.metadata.version.length()))
+                if (!BlockBreakerMod.versionChecker.isCurrentVersionBySubStringAsFloatNewer(BlockBreakerMod.instance.metadata.version.length() - 1, BlockBreakerMod.instance.metadata.version.length()))
                     for (String msg : BlockBreakerMod.versionChecker.getInGameMessage())
                         mcClient.thePlayer.addChatMessage(msg);
             
