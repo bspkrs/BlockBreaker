@@ -2,6 +2,7 @@ package bspkrs.blockbreaker;
 
 import java.io.File;
 
+import net.minecraft.block.Block;
 import net.minecraftforge.common.Configuration;
 import bspkrs.fml.util.Config;
 import bspkrs.util.CommonUtils;
@@ -40,14 +41,30 @@ public final class BBSettings
     {
         String ctgyGen = Configuration.CATEGORY_GENERAL;
         
-        /*
-         * if (Block.class.getSimpleName().equalsIgnoreCase("Block")) { // debug settings for deobfuscated execution blockList = "" +
-         * Block.stone.blockID + ";" + Block.dirt.blockID + ";" + Block.gravel.blockID + ";" + Block.glowStone.blockID + ";" +
-         * Block.oreCoal.blockID + ";" + Block.oreDiamond.blockID + ";" + Block.oreEmerald.blockID + ";" + Block.oreGold.blockID + ";" +
-         * Block.oreIron.blockID + ";" + Block.oreLapis.blockID + ";" + Block.oreRedstone.blockID + ";" + Block.oreRedstoneGlowing.blockID +
-         * ";"; itemDropMode = 1; blockLimit = -1; maxDistance = 20; blocksPerTick = 64; sneakAction = "disable"; if (file.exists())
-         * file.delete(); }
-         */
+        if (Block.class.getSimpleName().equalsIgnoreCase("Block"))
+        { // debug settings for deobfuscated execution
+            blockList = "" +
+                    Block.stone.blockID + ";" +
+                    Block.dirt.blockID + ";" +
+                    Block.gravel.blockID + ";" +
+                    Block.glowStone.blockID + ";" +
+                    Block.oreCoal.blockID + ";" +
+                    Block.oreDiamond.blockID + ";" +
+                    Block.oreEmerald.blockID + ";" +
+                    Block.oreGold.blockID + ";" +
+                    Block.oreIron.blockID + ";" +
+                    Block.oreLapis.blockID + ";" +
+                    Block.oreRedstone.blockID + ";" +
+                    Block.oreRedstoneGlowing.blockID +
+                    ";";
+            itemDropMode = 1;
+            blockLimit = -1;
+            maxDistance = 20;
+            blocksPerTick = 128;
+            sneakAction = "disable";
+            if (file.exists())
+                file.delete();
+        }
         
         config = new Configuration(file);
         
