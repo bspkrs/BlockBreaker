@@ -13,7 +13,7 @@ import bspkrs.util.CommonUtils;
 
 public final class BBSettings
 {
-    public static final String  MOD_VERSION_NUMBER   = "1.4.6.r02";
+    public static final String  MOD_VERSION_NUMBER   = "1.4.6.r03";
     public static int[][][]     blockGroups;
     
     public static Configuration config;
@@ -58,7 +58,7 @@ public final class BBSettings
                     Block.oreRedstoneGlowing.blockID +
                     ";";
             itemDropMode = 1;
-            blockLimit = -1;
+            blockLimit = 400;
             maxDistance = 20;
             blocksPerTick = 128;
             sneakAction = "disable";

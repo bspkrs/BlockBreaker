@@ -26,10 +26,11 @@ public class BBClient
     
     public void setServerDetected()
     {
-        serverDetected = BlockBreakerMod.instance.isCoreModLoaded;
+        serverDetected = true;
         if (serverDetected)
-            FMLClientHandler.instance().getClient().thePlayer.addChatMessage("BlockBreaker client-side features enabled.");
-        else
+            FMLClientHandler.instance().getClient().thePlayer.addChatMessage("BlockBreaker server detected.");
+        
+        else if (!BlockBreakerMod.instance.isCoreModLoaded && FMLClientHandler.instance().getClient().isSingleplayer())
         {
             String s = "BlockBreaker CoreMod code has not been injected. Ensure the downloaded .jar file is in the coremods folder and not mods.";
             FMLClientHandler.instance().getClient().thePlayer.addChatMessage(s);
