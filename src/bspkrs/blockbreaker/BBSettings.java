@@ -58,7 +58,7 @@ public final class BBSettings
                     Block.oreRedstoneGlowing.blockID +
                     ";";
             itemDropMode = 1;
-            blockLimit = 400;
+            blockLimit = -1;
             maxDistance = 20;
             blocksPerTick = 128;
             sneakAction = "disable";
