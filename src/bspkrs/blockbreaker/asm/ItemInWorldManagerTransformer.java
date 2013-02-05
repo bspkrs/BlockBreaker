@@ -194,8 +194,8 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
     
     private byte[] transformItemInWorldManager(byte[] bytes, HashMap hm)
     {
-        BBLog.info("BlockBreaker ASM Magic Time!");
-        BBLog.info("Class Transformation running on " + hm.get("javaClassName") + "...");
+        // BBLog.info("BlockBreaker ASM Magic Time!");
+        // BBLog.info("Class Transformation running on " + hm.get("javaClassName") + "...");
         
         ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(bytes);
@@ -208,7 +208,7 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
             MethodNode m = methods.next();
             if (m.name.equals(hm.get("targetMethodName")) && m.desc.equals(targetMethodDesc))
             {
-                BBLog.info("Found target method " + m.name + m.desc + "! Searching for landmarks...");
+                // BBLog.info("Found target method " + m.name + m.desc + "! Searching for landmarks...");
                 int blockIndex = 4;
                 int mdIndex = 5;
                 
@@ -227,10 +227,10 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                             int offset = 1;
                             while (m.instructions.get(index + offset).getOpcode() != ASTORE)
                                 offset++;
-                            BBLog.info("Found Block object ASTORE Node at " + (index + offset));
+                            // BBLog.info("Found Block object ASTORE Node at " + (index + offset));
                             VarInsnNode blockNode = (VarInsnNode) m.instructions.get(index + offset);
                             blockIndex = blockNode.var;
-                            BBLog.info("Block object is in local object " + blockIndex);
+                            // BBLog.info("Block object is in local object " + blockIndex);
                         }
                     }
                     
@@ -244,23 +244,23 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                             int offset = 1;
                             while (m.instructions.get(index + offset).getOpcode() != ISTORE)
                                 offset++;
-                            BBLog.info("Found metadata local variable ISTORE Node at " + (index + offset));
+                            // BBLog.info("Found metadata local variable ISTORE Node at " + (index + offset));
                             VarInsnNode mdFieldNode = (VarInsnNode) m.instructions.get(index + offset);
                             mdIndex = mdFieldNode.var;
-                            BBLog.info("Metadata is in local variable " + mdIndex);
+                            // BBLog.info("Metadata is in local variable " + mdIndex);
                         }
                     }
                     
                     if (m.instructions.get(index).getOpcode() == IFNULL)
                     {
-                        BBLog.info("Found IFNULL Node at " + index);
+                        // BBLog.info("Found IFNULL Node at " + index);
                         
                         int offset = 1;
                         while (m.instructions.get(index + offset).getOpcode() != ALOAD)
                             offset++;
                         
-                        BBLog.info("Found ALOAD Node at offset " + offset + " from IFNULL Node");
-                        BBLog.info("Patching method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + "...");
+                        // BBLog.info("Found ALOAD Node at offset " + offset + " from IFNULL Node");
+                        // BBLog.info("Patching method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + "...");
                         
                         // make a new label node for the end of our code
                         LabelNode lmm1Node = new LabelNode(new Label());
@@ -286,7 +286,8 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                         
                         m.instructions.insertBefore(m.instructions.get(index + offset), toInject);
                         
-                        BBLog.info("Method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + " patched at index " + (index + offset - 1));
+                        // BBLog.info("Method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + " patched at index " + (index +
+                        // offset - 1));
                         BBLog.info("BlockBreaker ASM Patching Complete!");
                         BlockBreakerMod.instance.isCoreModLoaded = true;
                         break;
