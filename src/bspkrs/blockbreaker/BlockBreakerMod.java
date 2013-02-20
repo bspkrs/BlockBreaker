@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
+import net.minecraft.src.mod_bspkrsCore;
 import net.minecraft.world.EnumGameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -31,7 +32,7 @@ import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 
-@Mod(name = "BlockBreaker", modid = "BlockBreaker", version = "Forge " + BBSettings.MOD_VERSION_NUMBER, useMetadata = true)
+@Mod(name = "BlockBreaker", modid = "BlockBreaker", version = "Forge " + BBSettings.MOD_VERSION_NUMBER, dependencies = "after:mod_bspkrsCore", useMetadata = true)
 @NetworkMod(clientSideRequired = false, serverSideRequired = false,
         clientPacketHandlerSpec = @SidedPacketHandler(channels = { "BlockBreaker" }, packetHandler = BBClientPacketHandler.class),
         serverPacketHandlerSpec = @SidedPacketHandler(channels = { "BlockBreaker" }, packetHandler = BBServerPacketHandler.class),
@@ -67,7 +68,7 @@ public class BlockBreakerMod
         metadata = event.getModMetadata();
         BBSettings.loadConfig(event.getSuggestedConfigurationFile());
         
-        if (BBSettings.allowUpdateCheck)
+        if (mod_bspkrsCore.allowUpdateCheck)
         {
             versionChecker = new ModVersionChecker(metadata.name, metadata.version, versionURL, mcfTopic, FMLLog.getLogger());
             versionChecker.checkVersionWithLoggingBySubStringAsFloat(metadata.version.length() - 1, metadata.version.length());
