@@ -177,7 +177,7 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
     }
     
     @Override
-    public byte[] transform(String name, byte[] bytes)
+    public byte[] transform(String name, String transformedName, byte[] bytes)
     {
         // TCLog.info("transforming: "+name);
         if (name.equals(obfStrings.get("className")))

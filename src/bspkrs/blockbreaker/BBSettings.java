@@ -13,7 +13,7 @@ import bspkrs.util.CommonUtils;
 
 public final class BBSettings
 {
-    public static final String  MOD_VERSION_NUMBER = "1.4.6.r04";
+    public static final String  MOD_VERSION_NUMBER = "1.4.6.r05";
     public static int[][][]     blockGroups;
     
     public static Configuration config;
@@ -53,12 +53,12 @@ public final class BBSettings
                     Block.oreIron.blockID + ";" +
                     Block.oreLapis.blockID + ";" +
                     Block.oreRedstone.blockID + ";" +
-                    Block.oreRedstoneGlowing.blockID +
-                    ";";
+                    Block.netherrack.blockID + ";" +
+                    Block.oreRedstoneGlowing.blockID + ";";
             itemDropMode = 1;
             blockLimit = -1;
-            maxDistance = 20;
-            blocksPerTick = 128;
+            maxDistance = 30;
+            blocksPerTick = 666;
             sneakAction = "disable";
             if (file.exists())
                 file.delete();

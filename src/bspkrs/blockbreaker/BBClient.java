@@ -27,15 +27,15 @@ public class BBClient
     public void setServerDetected()
     {
         serverDetected = true;
-        if (serverDetected)
-            FMLClientHandler.instance().getClient().thePlayer.addChatMessage("BlockBreaker server detected.");
         
-        else if (!BlockBreakerMod.instance.isCoreModLoaded && FMLClientHandler.instance().getClient().isSingleplayer())
+        if (!BlockBreakerMod.instance.isCoreModLoaded && FMLClientHandler.instance().getClient().isSingleplayer())
         {
             String s = "BlockBreaker CoreMod code has not been injected. Ensure the downloaded .jar file is in the coremods folder and not mods.";
             FMLClientHandler.instance().getClient().thePlayer.addChatMessage(s);
             BBLog.severe(s);
         }
+        else
+            FMLClientHandler.instance().getClient().thePlayer.addChatMessage("BlockBreaker server detected.");
     }
     
     public void onServerConfigReceived(String blockIDList, String axeIDList, float logHardnessNormal, float logHardnessModified)
