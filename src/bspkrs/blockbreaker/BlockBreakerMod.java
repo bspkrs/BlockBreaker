@@ -5,10 +5,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
-import net.minecraft.src.mod_bspkrsCore;
 import net.minecraft.world.EnumGameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import bspkrs.fml.util.bspkrsCoreProxy;
 import bspkrs.util.BlockID;
 import bspkrs.util.CommonUtils;
 import bspkrs.util.ModVersionChecker;
@@ -59,6 +59,7 @@ public class BlockBreakerMod
     
     public BlockBreakerMod()
     {
+        new bspkrsCoreProxy();
         loader = Loader.instance();
     }
     
@@ -68,7 +69,7 @@ public class BlockBreakerMod
         metadata = event.getModMetadata();
         BBSettings.loadConfig(event.getSuggestedConfigurationFile());
         
-        if (mod_bspkrsCore.allowUpdateCheck)
+        if (bspkrsCoreProxy.instance.allowUpdateCheck)
         {
             versionChecker = new ModVersionChecker(metadata.name, metadata.version, versionURL, mcfTopic, FMLLog.getLogger());
             versionChecker.checkVersionWithLoggingBySubStringAsFloat(metadata.version.length() - 1, metadata.version.length());
