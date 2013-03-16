@@ -40,7 +40,7 @@ import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 public class BlockBreakerMod
 {
     public static ModVersionChecker versionChecker;
-    private String                  versionURL      = "https://dl.dropbox.com/u/20748481/Minecraft/1.5.0/blockBreakerForge.version";
+    private String                  versionURL      = "http://bspk.rs/Minecraft/1.5.0/blockBreakerForge.version";
     private String                  mcfTopic        = "http://www.minecraftforum.net/topic/1009577-";
 
     @Metadata(value = "BlockBreaker")
