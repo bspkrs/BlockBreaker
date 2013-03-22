@@ -49,7 +49,7 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
          */
         obfStrings = new HashMap();
         
-        /* 1.5.0 mappings */
+        /* 1.5.1 mappings */
         /* net.minecraft.src.ItemInWorldManager */
         obfStrings.put("className", "jd");
         /* net/minecraft/src/ItemInWorldManager */
@@ -61,17 +61,41 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
         /* thisPlayerMP */
         obfStrings.put("entityPlayerFieldName", "b");
         /* net/minecraft/src/World */
-        obfStrings.put("worldJavaClassName", "zv");
+        obfStrings.put("worldJavaClassName", "aab");
         /* net/minecraft/src/World.getBlockMetadata() */
         obfStrings.put("getBlockMetadataMethodName", "h");
         /* net/minecraft/src/Block */
-        obfStrings.put("blockJavaClassName", "aou");
+        obfStrings.put("blockJavaClassName", "apa");
         /* net/minecraft/src/Block.blocksList[] */
         obfStrings.put("blocksListFieldName", "r");
         /* net/minecraft/src/EntityPlayer */
-        obfStrings.put("entityPlayerJavaClassName", "sk");
+        obfStrings.put("entityPlayerJavaClassName", "sq");
         /* net/minecraft/src/EntityPlayerMP */
         obfStrings.put("entityPlayerMPJavaClassName", "jc");
+        
+        /* 1.5.0 mappings */
+        //        /* net.minecraft.src.ItemInWorldManager */
+        //        obfStrings.put("className", "jd");
+        //        /* net/minecraft/src/ItemInWorldManager */
+        //        obfStrings.put("javaClassName", "jd");
+        //        /* removeBlock */
+        //        obfStrings.put("targetMethodName", "d");
+        //        /* theWorld */
+        //        obfStrings.put("worldFieldName", "a");
+        //        /* thisPlayerMP */
+        //        obfStrings.put("entityPlayerFieldName", "b");
+        //        /* net/minecraft/src/World */
+        //        obfStrings.put("worldJavaClassName", "zv");
+        //        /* net/minecraft/src/World.getBlockMetadata() */
+        //        obfStrings.put("getBlockMetadataMethodName", "h");
+        //        /* net/minecraft/src/Block */
+        //        obfStrings.put("blockJavaClassName", "aou");
+        //        /* net/minecraft/src/Block.blocksList[] */
+        //        obfStrings.put("blocksListFieldName", "r");
+        //        /* net/minecraft/src/EntityPlayer */
+        //        obfStrings.put("entityPlayerJavaClassName", "sk");
+        //        /* net/minecraft/src/EntityPlayerMP */
+        //        obfStrings.put("entityPlayerMPJavaClassName", "jc");
         
         /* 1.4.6/1.4.7 mappings */
         //        /* net.minecraft.src.ItemInWorldManager */
@@ -219,8 +243,8 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
     
     private byte[] transformItemInWorldManager(byte[] bytes, HashMap hm)
     {
-        // BBLog.info("BlockBreaker ASM Magic Time!");
-        // BBLog.info("Class Transformation running on " + hm.get("javaClassName") + "...");
+        //        BBLog.info("BlockBreaker ASM Magic Time!");
+        //        BBLog.info("Class Transformation running on " + hm.get("javaClassName") + "...");
         
         ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(bytes);
@@ -240,22 +264,23 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                 // find injection point in method (use IFNULL inst)
                 for (int index = 0; index < m.instructions.size(); index++)
                 {
-                    // TCLog.info("Processing INSN at " + index +
-                    // " of type " + m.instructions.get(index).getType() +
-                    // ", OpCode " + m.instructions.get(index).getOpcode());
+                    // BBLog.info("Processing INSN at " + index +
+                    //                     " of type " + m.instructions.get(index).getType() +
+                    //                     ", OpCode " + m.instructions.get(index).getOpcode());
                     // find local Block object node and from that, local object index
                     if (m.instructions.get(index).getType() == AbstractInsnNode.FIELD_INSN)
                     {
                         FieldInsnNode blocksListNode = (FieldInsnNode) m.instructions.get(index);
+                        //                        BBLog.info("Owner: %s    Name: %s", blocksListNode.owner, blocksListNode.name);
                         if (blocksListNode.owner.equals(hm.get("blockJavaClassName")) && blocksListNode.name.equals(hm.get("blocksListFieldName")))
                         {
                             int offset = 1;
                             while (m.instructions.get(index + offset).getOpcode() != ASTORE)
                                 offset++;
-                            // BBLog.info("Found Block object ASTORE Node at " + (index + offset));
+                            //                             BBLog.info("Found Block object ASTORE Node at " + (index + offset));
                             VarInsnNode blockNode = (VarInsnNode) m.instructions.get(index + offset);
                             blockIndex = blockNode.var;
-                            // BBLog.info("Block object is in local object " + blockIndex);
+                            //                             BBLog.info("Block object is in local object " + blockIndex);
                         }
                     }
                     
@@ -264,15 +289,16 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                     if (m.instructions.get(index).getType() == AbstractInsnNode.METHOD_INSN)
                     {
                         MethodInsnNode mdNode = (MethodInsnNode) m.instructions.get(index);
+                        //                        BBLog.info("Owner: %s    Name: %s", mdNode.owner, mdNode.name);
                         if (mdNode.owner.equals(hm.get("worldJavaClassName")) && mdNode.name.equals(hm.get("getBlockMetadataMethodName")))
                         {
                             int offset = 1;
                             while (m.instructions.get(index + offset).getOpcode() != ISTORE)
                                 offset++;
-                            // BBLog.info("Found metadata local variable ISTORE Node at " + (index + offset));
+                            //                             BBLog.info("Found metadata local variable ISTORE Node at " + (index + offset));
                             VarInsnNode mdFieldNode = (VarInsnNode) m.instructions.get(index + offset);
                             mdIndex = mdFieldNode.var;
-                            // BBLog.info("Metadata is in local variable " + mdIndex);
+                            //                             BBLog.info("Metadata is in local variable " + mdIndex);
                         }
                     }
                     
@@ -284,8 +310,8 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                         while (m.instructions.get(index + offset).getOpcode() != ALOAD)
                             offset++;
                         
-                        // BBLog.info("Found ALOAD Node at offset " + offset + " from IFNULL Node");
-                        // BBLog.info("Patching method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + "...");
+                        //                        BBLog.info("Found ALOAD Node at offset " + offset + " from IFNULL Node");
+                        //                        BBLog.info("Patching method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + "...");
                         
                         // make a new label node for the end of our code
                         LabelNode lmm1Node = new LabelNode(new Label());
@@ -311,8 +337,7 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
                         
                         m.instructions.insertBefore(m.instructions.get(index + offset), toInject);
                         
-                        // BBLog.info("Method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + " patched at index " + (index +
-                        // offset - 1));
+                        //  BBLog.info("Method " + (String) hm.get("javaClassName") + "/" + m.name + m.desc + " patched at index " + (index + offset - 1));
                         BBLog.info("BlockBreaker ASM Patching Complete!");
                         BlockBreakerMod.instance.isCoreModLoaded = true;
                         break;
