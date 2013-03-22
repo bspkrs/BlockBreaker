@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+FMLCorePlugin: bspkrs.blockbreaker.asm.BlockBreakerCorePlugin
+Created-By: 1.7.0 (Oracle Corporation)
+

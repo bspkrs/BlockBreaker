@@ -84,7 +84,7 @@ public class BlockBreaker
                         {
                             if (world.blockHasTileEntity(blockPos.x, blockPos.y, blockPos.z))
                                 world.removeBlockTileEntity(blockPos.x, blockPos.y, blockPos.z);
-                            world.setBlockAndMetadataWithNotify(blockPos.x, blockPos.y, blockPos.z, 0, 0, 3);
+                            world.setBlock(blockPos.x, blockPos.y, blockPos.z, 0, 0, 3);
                             
                             if (enableDrops)
                                 addDrop(block, metadata);
