@@ -49,7 +49,7 @@ public class ItemInWorldManagerTransformer implements IClassTransformer
          */
         obfStrings = new HashMap();
         
-        /* 1.5.1 mappings */
+        /* 1.5.1/1.5.2 mappings */
         /* net.minecraft.src.ItemInWorldManager */
         obfStrings.put("className", "jd");
         /* net/minecraft/src/ItemInWorldManager */

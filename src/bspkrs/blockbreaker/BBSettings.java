@@ -2,9 +2,9 @@ package bspkrs.blockbreaker;
 
 import java.io.File;
 
-import net.minecraftforge.common.Configuration;
 import bspkrs.fml.util.Config;
 import bspkrs.util.CommonUtils;
+import bspkrs.util.Configuration;
 
 /*
  * @Author bspkrs
@@ -12,7 +12,6 @@ import bspkrs.util.CommonUtils;
 
 public final class BBSettings
 {
-    public static final String  MOD_VERSION_NUMBER = "1.5.1.r01";
     public static int[][][]     blockGroups;
     
     public static Configuration config;
