@@ -75,6 +75,10 @@ public class BlockBreaker
                     Block block = Block.blocksList[id];
                     if (block == null)
                         continue;
+
+                    // dirty fix for redstone ore
+                    if ((id == 73 || id == 74) && (blockID.id == 73 || blockID.id == 74))
+                        id = blockID.id;
                     
                     int metadata = world.getBlockMetadata(blockPos.x, blockPos.y, blockPos.z);
                     if (id == blockID.id && (blockID.metadata == -1 || blockID.metadata == metadata))
@@ -82,14 +86,14 @@ public class BlockBreaker
                         if ((LIMIT == -1 || blocksHarvested <= LIMIT) && (MAX_DISTANCE == -1
                                 || getSphericalDistance(blockPos.x, blockPos.y, blockPos.z) <= MAX_DISTANCE))
                         {
+                            if (enableDrops)
+                                addDrop(block, metadata, blockPos);
+                            
+                            blocksHarvested++;
+                            
                             if (world.blockHasTileEntity(blockPos.x, blockPos.y, blockPos.z))
                                 world.removeBlockTileEntity(blockPos.x, blockPos.y, blockPos.z);
                             world.setBlock(blockPos.x, blockPos.y, blockPos.z, 0, 0, 3);
-                            
-                            if (enableDrops)
-                                addDrop(block, metadata);
-                            
-                            blocksHarvested++;
                             
                             if (!scheduledBlocks.contains(blockPos))
                                 scheduledBlocks.add(blockPos);
@@ -100,45 +104,48 @@ public class BlockBreaker
         }
     }
     
-    private void addDrop(Block block, int metadata)
+    private void addDrop(Block block, int metadata, Coord pos)
     {
-        Random random = new Random();
-        int idDropped = block.idDropped(0, random, 0);
-        int damage = block.damageDropped(metadata);
-        int quantity = block.quantityDropped(random);
-        ItemStack drop = new ItemStack(idDropped, quantity, damage);
-        
-        int index = -1;
-        for (int i = 0; i < drops.size(); i++)
+        List<ItemStack> stacks = block.getBlockDropped(world, pos.x, pos.y, pos.z, metadata, 0);
+        if (stacks == null) return;
+        for (ItemStack drop: stacks)
         {
-            if (drops.get(i).isItemEqual(drop))
+            if (drop == null) continue;
+            
+            int index = -1;
+            for (int i = 0; i < drops.size(); i++)
             {
-                index = i;
-                break;
+                if (drops.get(i).isItemEqual(drop))
+                {
+                    index = i;
+                    break;
+                }
+            }
+            
+            if (index == -1)
+            {
+                drops.add(drop);
+                index = drops.indexOf(drop);
+            }
+            else
+            {
+                int quantity = drop.stackSize;
+                drop = drops.get(index);
+                drop.stackSize += quantity;
+            }
+            
+            if (drop.stackSize >= drop.getMaxStackSize())
+            {
+                int i = drop.stackSize - drop.getMaxStackSize();
+                drop.stackSize = drop.getMaxStackSize();
+                world.spawnEntityInWorld(new EntityItem(world, startingPos.x, startingPos.y, startingPos.z, drop));
+                if (i > 0)
+                    drop.stackSize = i;
+                else
+                    drops.remove(index);
             }
         }
         
-        if (index == -1)
-        {
-            drops.add(drop);
-            index = drops.indexOf(drop);
-        }
-        else
-        {
-            drop = drops.get(index);
-            drop.stackSize += quantity;
-        }
-        
-        if (drop.stackSize >= drop.getMaxStackSize())
-        {
-            int i = drop.stackSize - drop.getMaxStackSize();
-            drop.stackSize = drop.getMaxStackSize();
-            world.spawnEntityInWorld(new EntityItem(world, startingPos.x, startingPos.y, startingPos.z, drop));
-            if (i > 0)
-                drop.stackSize = i;
-            else
-                drops.remove(index);
-        }
     }
     
     private int getCubicDistance(int x, int y, int z)
