@@ -1,0 +1,20 @@
+1.5.2.r02 - 24-May-2013
+- bspkrsCore update
+1.5.2.r01 - 03-May-2013
+- updated for 1.5.2
+1.5.0.r01 - 15-Mar-2013
+- updated for 1.5
+- fixed crash on startup
+- fixed derp in version info
+1.4.6.r04 - 20-Feb-2013
+- updated to support bspkrsCore
+1.4.6.r03 - 05-Feb-2013
+- fixed client-side chat message
+1.4.6.r02 - 31-Jan-2013
+- fixed jar manifest derp
+1.4.6.r01 - 30-Jan-2013
+- renamed to BlockBreaker
+- rewrote most of mod
+- got basic functionality working again
+1.2.5.c (FML and MLMP) - 06-Jul-2012
+- first FML release
