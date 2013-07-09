@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import bspkrs.util.BlockID;
 import bspkrs.util.CommonUtils;
@@ -30,11 +35,14 @@ public class BlockBreaker
     private Coord           startingPos;
     private BlockID         blockID;
     private World           world;
+    private EntityPlayer    player;
     private List<ItemStack> drops;
+    private ItemStack       tool;
     
-    public BlockBreaker(World world, BlockID blockData, int x, int y, int z, boolean enableDrops)
+    public BlockBreaker(World world, EntityPlayer player, BlockID blockData, int x, int y, int z, boolean enableDrops)
     {
         this.world = world;
+        this.player = player;
         TickRegistry.registerTickHandler(new BBTicker(EnumSet.of(TickType.SERVER)), Side.SERVER);
         this.enableDrops = enableDrops;
         blocksHarvested = 0;
@@ -42,6 +50,7 @@ public class BlockBreaker
         this.blockID = blockData;
         startingPos = new Coord(x, y, z);
         drops = new ArrayList<ItemStack>();
+        tool = player.getCurrentEquippedItem();
     }
     
     private String iterate(int[][] group)
@@ -87,7 +96,19 @@ public class BlockBreaker
                                 || getSphericalDistance(blockPos.x, blockPos.y, blockPos.z) <= MAX_DISTANCE))
                         {
                             if (enableDrops)
+                            {
                                 addDrop(block, metadata, blockPos);
+                                if (tool != null)
+                                {
+                                    tool.getItem().onBlockDestroyed(tool, world, id, blockPos.x, blockPos.y, blockPos.z, player);
+                                    if (tool.stackSize < 1)
+                                    {
+                                        player.destroyCurrentEquippedItem();
+                                        tool = null;
+                                        return;
+                                    }
+                                }
+                            }
                             
                             blocksHarvested++;
                             
@@ -106,7 +127,23 @@ public class BlockBreaker
     
     private void addDrop(Block block, int metadata, Coord pos)
     {
-        List<ItemStack> stacks = block.getBlockDropped(world, pos.x, pos.y, pos.z, metadata, 0);
+        player.addStat(StatList.mineBlockStatArray[block.blockID], 1);
+        player.addExhaustion(0.025F);
+        List<ItemStack> stacks = null;
+        
+        if (block.canSilkHarvest(world, player, pos.x, pos.y, pos.z, metadata) && EnchantmentHelper.getSilkTouchModifier(player))
+        {
+            stacks = new ArrayList<ItemStack>();
+            stacks.add(new ItemStack(block.blockID, 1, metadata));
+        }
+        else
+        {
+            int fortune = EnchantmentHelper.getFortuneModifier(player);
+            stacks = block.getBlockDropped(world, pos.x, pos.y, pos.z, metadata, fortune);
+            // for dropXp
+            block.dropBlockAsItemWithChance(world, startingPos.x, startingPos.y, startingPos.z, metadata, -1.0F, fortune);
+        }
+
         if (stacks == null) return;
         for (ItemStack drop: stacks)
         {
@@ -145,7 +182,6 @@ public class BlockBreaker
                     drops.remove(index);
             }
         }
-        
     }
     
     private int getCubicDistance(int x, int y, int z)
