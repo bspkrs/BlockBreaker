@@ -15,18 +15,12 @@ import bspkrs.util.Const;
 import bspkrs.util.ModVersionChecker;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.IMCCallback;
-import cpw.mods.fml.common.Mod.Init;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.Metadata;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
-import cpw.mods.fml.common.Mod.ServerStarted;
 import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLInterModComms.IMCEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.network.NetworkMod;
@@ -40,7 +34,7 @@ import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 public class BlockBreakerMod
 {
     public static ModVersionChecker versionChecker;
-    private String                  versionURL      = "http://bspk.rs/Minecraft/" + Const.MCVERSION + "/blockBreakerForge.version";
+    private String                  versionURL      = Const.VERSION_URL + "/Minecraft/" + Const.MCVERSION + "/blockBreakerForge.version";
     private String                  mcfTopic        = "http://www.minecraftforum.net/topic/1009577-";
     
     @Metadata(value = "BlockBreaker")
@@ -63,7 +57,7 @@ public class BlockBreakerMod
         loader = Loader.instance();
     }
     
-    @PreInit
+    @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         metadata = event.getModMetadata();
@@ -76,25 +70,13 @@ public class BlockBreakerMod
         }
     }
     
-    @Init
+    @EventHandler
     public void init(FMLInitializationEvent event)
     {
         proxy.onLoad();
     }
     
-    @IMCCallback
-    public void processIMCMessages(IMCEvent event)
-    {   
-        
-    }
-    
-    @PostInit
-    public void postInit(FMLPostInitializationEvent event)
-    {   
-        
-    }
-    
-    @ServerStarted
+    @EventHandler
     public void serverStarted(FMLServerStartedEvent event)
     {
         new BBServer();
