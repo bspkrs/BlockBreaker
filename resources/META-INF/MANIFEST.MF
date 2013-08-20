@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
 FMLCorePlugin: bspkrs.blockbreaker.asm.BlockBreakerCorePlugin
+FMLCorePluginContainsFMLMod: bspkrs.blockbreaker.BlockBreakerMod
 Created-By: 1.7.0 (Oracle Corporation)
 
