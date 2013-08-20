@@ -105,14 +105,14 @@ public class BlockBreakerMod
                 
                 if (player.capabilities.isCreativeMode)
                 {
-                    BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode >= 2);
+                    BlockBreaker cd = new BlockBreaker(world, player, blockID, x, y, z, BBSettings.itemDropMode >= 2);
                     cd.harvestConnectedBlocks(x, y, z);
                 }
                 else if (world.getWorldInfo().getGameType().equals(EnumGameType.ADVENTURE))
                 {
                     if (canHarvestBlock)
                     {
-                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode == 3);
+                        BlockBreaker cd = new BlockBreaker(world, player, blockID, x, y, z, BBSettings.itemDropMode == 3);
                         cd.harvestConnectedBlocks(x, y, z);
                     }
                 }
@@ -121,7 +121,7 @@ public class BlockBreakerMod
                 {
                     if (canHarvestBlock)
                     {
-                        BlockBreaker cd = new BlockBreaker(world, blockID, x, y, z, BBSettings.itemDropMode >= 1);
+                        BlockBreaker cd = new BlockBreaker(world, player, blockID, x, y, z, BBSettings.itemDropMode >= 1);
                         cd.harvestConnectedBlocks(x, y, z);
                     }
                 }
