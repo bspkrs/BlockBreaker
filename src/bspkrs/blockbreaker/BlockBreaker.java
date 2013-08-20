@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import bspkrs.util.BlockID;
 import bspkrs.util.CommonUtils;
@@ -30,11 +35,14 @@ public class BlockBreaker
     private Coord           startingPos;
     private BlockID         blockID;
     private World           world;
+    private EntityPlayer    player;
     private List<ItemStack> drops;
+    private ItemStack       tool;
     
-    public BlockBreaker(World world, BlockID blockData, int x, int y, int z, boolean enableDrops)
+    public BlockBreaker(World world, EntityPlayer player, BlockID blockData, int x, int y, int z, boolean enableDrops)
     {
         this.world = world;
+        this.player = player;
         TickRegistry.registerTickHandler(new BBTicker(EnumSet.of(TickType.SERVER)), Side.SERVER);
         this.enableDrops = enableDrops;
         blocksHarvested = 0;
@@ -42,6 +50,7 @@ public class BlockBreaker
         this.blockID = blockData;
         startingPos = new Coord(x, y, z);
         drops = new ArrayList<ItemStack>();
+        tool = player.getCurrentEquippedItem();
     }
     
     private String iterate(int[][] group)
@@ -75,6 +84,10 @@ public class BlockBreaker
                     Block block = Block.blocksList[id];
                     if (block == null)
                         continue;
+
+                    // dirty fix for redstone ore
+                    if ((id == 73 || id == 74) && (blockID.id == 73 || blockID.id == 74))
+                        id = blockID.id;
                     
                     int metadata = world.getBlockMetadata(blockPos.x, blockPos.y, blockPos.z);
                     if (id == blockID.id && (blockID.metadata == -1 || blockID.metadata == metadata))
@@ -82,14 +95,26 @@ public class BlockBreaker
                         if ((LIMIT == -1 || blocksHarvested <= LIMIT) && (MAX_DISTANCE == -1
                                 || getSphericalDistance(blockPos.x, blockPos.y, blockPos.z) <= MAX_DISTANCE))
                         {
+                            if (enableDrops)
+                            {
+                                addDrop(block, metadata, blockPos);
+                                if (tool != null)
+                                {
+                                    tool.getItem().onBlockDestroyed(tool, world, id, blockPos.x, blockPos.y, blockPos.z, player);
+                                    if (tool.stackSize < 1)
+                                    {
+                                        player.destroyCurrentEquippedItem();
+                                        tool = null;
+                                        return;
+                                    }
+                                }
+                            }
+                            
+                            blocksHarvested++;
+                            
                             if (world.blockHasTileEntity(blockPos.x, blockPos.y, blockPos.z))
                                 world.removeBlockTileEntity(blockPos.x, blockPos.y, blockPos.z);
                             world.setBlock(blockPos.x, blockPos.y, blockPos.z, 0, 0, 3);
-                            
-                            if (enableDrops)
-                                addDrop(block, metadata);
-                            
-                            blocksHarvested++;
                             
                             if (!scheduledBlocks.contains(blockPos))
                                 scheduledBlocks.add(blockPos);
@@ -100,44 +125,62 @@ public class BlockBreaker
         }
     }
     
-    private void addDrop(Block block, int metadata)
+    private void addDrop(Block block, int metadata, Coord pos)
     {
-        Random random = new Random();
-        int idDropped = block.idDropped(0, random, 0);
-        int damage = block.damageDropped(metadata);
-        int quantity = block.quantityDropped(random);
-        ItemStack drop = new ItemStack(idDropped, quantity, damage);
+        player.addStat(StatList.mineBlockStatArray[block.blockID], 1);
+        player.addExhaustion(0.025F);
+        List<ItemStack> stacks = null;
         
-        int index = -1;
-        for (int i = 0; i < drops.size(); i++)
+        if (block.canSilkHarvest(world, player, pos.x, pos.y, pos.z, metadata) && EnchantmentHelper.getSilkTouchModifier(player))
         {
-            if (drops.get(i).isItemEqual(drop))
-            {
-                index = i;
-                break;
-            }
-        }
-        
-        if (index == -1)
-        {
-            drops.add(drop);
-            index = drops.indexOf(drop);
+            stacks = new ArrayList<ItemStack>();
+            stacks.add(new ItemStack(block.blockID, 1, metadata));
         }
         else
         {
-            drop = drops.get(index);
-            drop.stackSize += quantity;
+            int fortune = EnchantmentHelper.getFortuneModifier(player);
+            stacks = block.getBlockDropped(world, pos.x, pos.y, pos.z, metadata, fortune);
+            // for dropXp
+            block.dropBlockAsItemWithChance(world, startingPos.x, startingPos.y, startingPos.z, metadata, -1.0F, fortune);
         }
-        
-        if (drop.stackSize >= drop.getMaxStackSize())
+
+        if (stacks == null) return;
+        for (ItemStack drop: stacks)
         {
-            int i = drop.stackSize - drop.getMaxStackSize();
-            drop.stackSize = drop.getMaxStackSize();
-            world.spawnEntityInWorld(new EntityItem(world, startingPos.x, startingPos.y, startingPos.z, drop));
-            if (i > 0)
-                drop.stackSize = i;
+            if (drop == null) continue;
+            
+            int index = -1;
+            for (int i = 0; i < drops.size(); i++)
+            {
+                if (drops.get(i).isItemEqual(drop))
+                {
+                    index = i;
+                    break;
+                }
+            }
+            
+            if (index == -1)
+            {
+                drops.add(drop);
+                index = drops.indexOf(drop);
+            }
             else
-                drops.remove(index);
+            {
+                int quantity = drop.stackSize;
+                drop = drops.get(index);
+                drop.stackSize += quantity;
+            }
+            
+            if (drop.stackSize >= drop.getMaxStackSize())
+            {
+                int i = drop.stackSize - drop.getMaxStackSize();
+                drop.stackSize = drop.getMaxStackSize();
+                world.spawnEntityInWorld(new EntityItem(world, startingPos.x, startingPos.y, startingPos.z, drop));
+                if (i > 0)
+                    drop.stackSize = i;
+                else
+                    drops.remove(index);
+            }
         }
     }
     
