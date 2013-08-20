@@ -14,7 +14,7 @@
         <property name="mcp.home" location="${dir.mcp}"/>
         <property name="dev.core.home" location="${dir.core.project}"/>
         <property name="release.home" location="${dir.release}"/>
-        <property name="release.jar" value="[${version.minecraft}]${mod.id}.Forge.${version}.Uni.CoreMod.jar"/>
+        <property name="release.jar" value="[${version.minecraft}]${mod.id}.Forge.${version}.Universal.jar"/>
 
         <!-- setup python -->
         <property name="python.win" location="${mcp.home}/runtime/bin/python/python_mcp"/>
