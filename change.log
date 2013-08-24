@@ -1,3 +1,8 @@
+1.6.2.r02 - 24-Aug-2013
+- fixed jar manifest
+- cleaned up packet code
+- merged pull request for redstone fix, improved drops handling, and item damage
+- added new options for dropping stacks in place, item damage, and break shape
 1.6.2.r01 - 10-Jul-2013
 - 1.6.2 update
 1.6.1.r02 - 09-Jul-2013
