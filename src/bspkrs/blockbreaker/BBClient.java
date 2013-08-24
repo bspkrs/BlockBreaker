@@ -30,16 +30,15 @@ public class BBClient
         
         if (!BlockBreakerMod.instance.isCoreModLoaded && FMLClientHandler.instance().getClient().isSingleplayer())
         {
-            String s = "BlockBreaker CoreMod code has not been injected. Ensure the downloaded .jar file is in the coremods folder and not mods.";
-            FMLClientHandler.instance().getClient().thePlayer.addChatMessage(s);
-            BBLog.severe(s);
+            FMLClientHandler.instance().getClient().thePlayer.addChatMessage("BlockBreaker hook has not been injected. Possible causes: 1. You deleted META-INF from the mod archive. Don't do this. 2. You are trying to run from Eclipse and forgot to put the dummy jar in the mcp/jars/mods folder.");
+            serverDetected = false;
         }
         else
-            FMLClientHandler.instance().getClient().thePlayer.addChatMessage("BlockBreaker server detected.");
+            BBLog.info("BlockBreaker server detected.");
     }
     
-    public void onServerConfigReceived(String blockIDList, String axeIDList, float logHardnessNormal, float logHardnessModified)
-    {   
-        
-    }
+    //    public void onServerConfigReceived(String blockIDList, String axeIDList, float logHardnessNormal, float logHardnessModified)
+    //    {   
+    //        
+    //    }
 }
