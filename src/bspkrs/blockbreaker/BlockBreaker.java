@@ -3,16 +3,13 @@ package bspkrs.blockbreaker;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import bspkrs.util.BlockID;
 import bspkrs.util.CommonUtils;
@@ -33,6 +30,7 @@ public class BlockBreaker
     private List<Coord>     scheduledBlocks = new ArrayList<Coord>();
     
     private Coord           startingPos;
+    private Coord           dropPos;
     private BlockID         blockID;
     private World           world;
     private EntityPlayer    player;
@@ -49,6 +47,7 @@ public class BlockBreaker
         scheduledBlocks = new ArrayList<Coord>();
         this.blockID = blockData;
         startingPos = new Coord(x, y, z);
+        dropPos = startingPos.clone();
         drops = new ArrayList<ItemStack>();
         tool = player.getCurrentEquippedItem();
     }
@@ -64,7 +63,7 @@ public class BlockBreaker
     }
     
     /*
-     * Breaks all the
+     * Breaks all the connected blocks of the same type within a specific range of the starting block
      */
     public void harvestConnectedBlocks(int x, int y, int z)
     {
@@ -84,7 +83,7 @@ public class BlockBreaker
                     Block block = Block.blocksList[id];
                     if (block == null)
                         continue;
-
+                    
                     // dirty fix for redstone ore
                     if ((id == 73 || id == 74) && (blockID.id == 73 || blockID.id == 74))
                         id = blockID.id;
@@ -92,19 +91,20 @@ public class BlockBreaker
                     int metadata = world.getBlockMetadata(blockPos.x, blockPos.y, blockPos.z);
                     if (id == blockID.id && (blockID.metadata == -1 || blockID.metadata == metadata))
                     {
-                        if ((LIMIT == -1 || blocksHarvested <= LIMIT) && (MAX_DISTANCE == -1
-                                || getSphericalDistance(blockPos.x, blockPos.y, blockPos.z) <= MAX_DISTANCE))
+                        int distance = BBSettings.breakShape.equalsIgnoreCase("cubic") ? getDistance(blockPos.x, blockPos.y, blockPos.z) : getSphericalDistance(blockPos.x, blockPos.y, blockPos.z);
+                        if ((LIMIT == -1 || blocksHarvested <= LIMIT) && (MAX_DISTANCE == -1 || distance <= MAX_DISTANCE))
                         {
                             if (enableDrops)
                             {
                                 addDrop(block, metadata, blockPos);
-                                if (tool != null)
+                                if (tool != null && BBSettings.allowItemDamage)
                                 {
                                     tool.getItem().onBlockDestroyed(tool, world, id, blockPos.x, blockPos.y, blockPos.z, player);
-                                    if (tool.stackSize < 1)
+                                    if (tool != null && tool.stackSize < 1)
                                     {
                                         player.destroyCurrentEquippedItem();
                                         tool = null;
+                                        scheduledBlocks.clear();
                                         return;
                                     }
                                 }
@@ -131,6 +131,8 @@ public class BlockBreaker
         player.addExhaustion(0.025F);
         List<ItemStack> stacks = null;
         
+        dropPos = BBSettings.itemsDropInPlace ? pos.clone() : startingPos.clone();
+        
         if (block.canSilkHarvest(world, player, pos.x, pos.y, pos.z, metadata) && EnchantmentHelper.getSilkTouchModifier(player))
         {
             stacks = new ArrayList<ItemStack>();
@@ -141,13 +143,15 @@ public class BlockBreaker
             int fortune = EnchantmentHelper.getFortuneModifier(player);
             stacks = block.getBlockDropped(world, pos.x, pos.y, pos.z, metadata, fortune);
             // for dropXp
-            block.dropBlockAsItemWithChance(world, startingPos.x, startingPos.y, startingPos.z, metadata, -1.0F, fortune);
+            block.dropBlockAsItemWithChance(world, dropPos.x, dropPos.y, dropPos.z, metadata, -1.0F, fortune);
         }
-
-        if (stacks == null) return;
-        for (ItemStack drop: stacks)
+        
+        if (stacks == null)
+            return;
+        for (ItemStack drop : stacks)
         {
-            if (drop == null) continue;
+            if (drop == null)
+                continue;
             
             int index = -1;
             for (int i = 0; i < drops.size(); i++)
@@ -175,7 +179,7 @@ public class BlockBreaker
             {
                 int i = drop.stackSize - drop.getMaxStackSize();
                 drop.stackSize = drop.getMaxStackSize();
-                world.spawnEntityInWorld(new EntityItem(world, startingPos.x, startingPos.y, startingPos.z, drop));
+                world.spawnEntityInWorld(new EntityItem(world, dropPos.x, dropPos.y, dropPos.z, drop));
                 if (i > 0)
                     drop.stackSize = i;
                 else
@@ -206,13 +210,14 @@ public class BlockBreaker
         {
             Coord blockPos = scheduledBlocks.remove(0);
             removed++;
+            dropPos = BBSettings.itemsDropInPlace ? blockPos.clone() : startingPos.clone();
             harvestConnectedBlocks(blockPos.x, blockPos.y, blockPos.z);
         }
         
         if (scheduledBlocks.size() == 0)
         {
             while (drops.size() > 0)
-                world.spawnEntityInWorld(new EntityItem(world, startingPos.x, startingPos.y, startingPos.z, drops.remove(0)));
+                world.spawnEntityInWorld(new EntityItem(world, dropPos.x, dropPos.y, dropPos.z, drops.remove(0)));
         }
         
         return scheduledBlocks;
