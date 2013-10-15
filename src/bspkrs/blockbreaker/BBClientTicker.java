@@ -4,7 +4,7 @@ import java.util.EnumSet;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
-import bspkrs.fml.util.bspkrsCoreProxy;
+import bspkrs.bspkrscore.fml.bspkrsCoreMod;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
@@ -57,8 +57,8 @@ public class BBClientTicker implements ITickHandler
         
         if (mcClient != null && mcClient.thePlayer != null)
         {
-            if (bspkrsCoreProxy.instance.allowUpdateCheck && BlockBreakerMod.versionChecker != null)
-                if (!BlockBreakerMod.versionChecker.isCurrentVersionBySubStringAsFloatNewer(BlockBreakerMod.instance.metadata.version.length() - 1, BlockBreakerMod.instance.metadata.version.length()))
+            if (bspkrsCoreMod.instance.allowUpdateCheck && BlockBreakerMod.versionChecker != null)
+                if (!BlockBreakerMod.versionChecker.isCurrentVersion())
                     for (String msg : BlockBreakerMod.versionChecker.getInGameMessage())
                         mcClient.thePlayer.addChatMessage(msg);
             

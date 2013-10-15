@@ -26,7 +26,7 @@ import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 
-@Mod(name = "BlockBreaker", modid = "BlockBreaker", version = "Forge " + Strings.MOD_VERSION_NUMBER, dependencies = "required-after:mod_bspkrsCore", useMetadata = true)
+@Mod(name = "BlockBreaker", modid = "BlockBreaker", version = "Forge " + Strings.MOD_VERSION_NUMBER, dependencies = "required-after:bspkrsCore", useMetadata = true)
 @NetworkMod(clientSideRequired = false, serverSideRequired = false,
         clientPacketHandlerSpec = @SidedPacketHandler(channels = { "BlockBreaker" }, packetHandler = BBClientPacketHandler.class),
         serverPacketHandlerSpec = @SidedPacketHandler(channels = { "BlockBreaker" }, packetHandler = BBServerPacketHandler.class),
