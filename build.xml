@@ -103,9 +103,10 @@
             <fileset dir="${mcp.bin}" includes="bspkrs/blockbreaker/**/*.class"/>
             <fileset dir="${dev.resources}">
 				<exclude name="mcmod.template"/>
-				<exclude name="coremods"/>
-				<exclude name="coremods/*"/>
+				<exclude name="mods"/>
+				<exclude name="mods/*"/>
 			</fileset>
+            <fileset dir="${mcp.home}/.." includes="forgeversion.properties"/>
             <mappedresources>
                 <concat>
                     <fileset dir="${dev.resources}" includes="mcmod.template"/>
