@@ -4,16 +4,14 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.EnumGameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import bspkrs.fml.util.bspkrsCoreProxy;
+import bspkrs.bspkrscore.fml.bspkrsCoreMod;
 import bspkrs.util.BlockID;
 import bspkrs.util.CommonUtils;
 import bspkrs.util.Const;
 import bspkrs.util.ModVersionChecker;
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -49,24 +47,16 @@ public class BlockBreakerMod
     @Instance(value = "BlockBreaker")
     public static BlockBreakerMod   instance;
     
-    private static Loader           loader;
-    
-    public BlockBreakerMod()
-    {
-        new bspkrsCoreProxy();
-        loader = Loader.instance();
-    }
-    
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         metadata = event.getModMetadata();
         BBSettings.loadConfig(event.getSuggestedConfigurationFile());
         
-        if (bspkrsCoreProxy.instance.allowUpdateCheck)
+        if (bspkrsCoreMod.instance.allowUpdateCheck)
         {
             versionChecker = new ModVersionChecker(metadata.name, metadata.version, versionURL, mcfTopic);
-            versionChecker.checkVersionWithLoggingBySubStringAsFloat(metadata.version.length() - 1, metadata.version.length());
+            versionChecker.checkVersionWithLogging();
         }
     }
     
@@ -96,7 +86,6 @@ public class BlockBreakerMod
         {
             BlockID blockID = new BlockID(block, metadata);
             
-            ItemStack item = player.getCurrentEquippedItem();
             boolean canHarvestBlock = ForgeHooks.canHarvestBlock(block, player, metadata);
             if (!world.isRemote && CommonUtils.isBlockInGroups(new int[] { blockID.id, metadata }, BBSettings.blockGroups) && isBreakingEnabled(player))
             {

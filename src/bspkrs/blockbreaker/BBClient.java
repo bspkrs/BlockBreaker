@@ -28,7 +28,7 @@ public class BBClient
     {
         serverDetected = true;
         
-        if (!BlockBreakerMod.instance.isCoreModLoaded && FMLClientHandler.instance().getClient().isSingleplayer())
+        if (!BlockBreakerMod.isCoreModLoaded && FMLClientHandler.instance().getClient().isSingleplayer())
         {
             FMLClientHandler.instance().getClient().thePlayer.addChatMessage("BlockBreaker hook has not been injected. Possible causes: 1. You deleted META-INF from the mod archive. Don't do this. 2. You are trying to run from Eclipse and forgot to put the dummy jar in the mcp/jars/mods folder.");
             serverDetected = false;
@@ -36,9 +36,4 @@ public class BBClient
         else
             BBLog.info("BlockBreaker server detected.");
     }
-    
-    //    public void onServerConfigReceived(String blockIDList, String axeIDList, float logHardnessNormal, float logHardnessModified)
-    //    {   
-    //        
-    //    }
 }
