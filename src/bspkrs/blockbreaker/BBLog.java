@@ -3,7 +3,7 @@ package bspkrs.blockbreaker;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.src.ModLoader;
+import cpw.mods.fml.common.FMLLog;
 
 public enum BBLog
 {
@@ -25,7 +25,7 @@ public enum BBLog
             return;
         
         logger = Logger.getLogger("BlockBreaker");
-        logger.setParent(ModLoader.getLogger());
+        logger.setParent(FMLLog.getLogger());
     }
     
     public static void info(String format, Object... args)
