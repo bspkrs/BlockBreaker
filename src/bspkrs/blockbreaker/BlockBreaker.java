@@ -11,10 +11,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.world.World;
+import bspkrs.fml.util.TickerBase;
 import bspkrs.util.BlockID;
 import bspkrs.util.CommonUtils;
 import bspkrs.util.Coord;
-import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -41,7 +41,7 @@ public class BlockBreaker
     {
         this.world = world;
         this.player = player;
-        TickRegistry.registerTickHandler(new BBTicker(EnumSet.of(TickType.SERVER)), Side.SERVER);
+        TickRegistry.registerTickHandler(new BBTicker().addTicks(EnumSet.of(TickType.SERVER)), Side.SERVER);
         this.enableDrops = enableDrops;
         blocksHarvested = 0;
         scheduledBlocks = new ArrayList<Coord>();
@@ -52,6 +52,7 @@ public class BlockBreaker
         tool = player.getCurrentEquippedItem();
     }
     
+    @SuppressWarnings("unused")
     private String iterate(int[][] group)
     {
         String res = "";
@@ -78,7 +79,7 @@ public class BlockBreaker
                         continue;
                     
                     Coord blockPos = new Coord(x + dx, y + dy, z + dz);
-                    int id = world.getBlockId(blockPos.x, blockPos.y, blockPos.z);
+                    int id = blockPos.getBlockID(world);
                     
                     Block block = Block.blocksList[id];
                     if (block == null)
@@ -88,10 +89,11 @@ public class BlockBreaker
                     if ((id == 73 || id == 74) && (blockID.id == 73 || blockID.id == 74))
                         id = blockID.id;
                     
-                    int metadata = world.getBlockMetadata(blockPos.x, blockPos.y, blockPos.z);
+                    int metadata = blockPos.getBlockMetadata(world);
                     if (id == blockID.id && (blockID.metadata == -1 || blockID.metadata == metadata))
                     {
-                        int distance = BBSettings.breakShape.equalsIgnoreCase("cubic") ? getDistance(blockPos.x, blockPos.y, blockPos.z) : getSphericalDistance(blockPos.x, blockPos.y, blockPos.z);
+                        int distance = BBSettings.breakShape.equalsIgnoreCase("cubic") ? getDistance(blockPos.x, blockPos.y, blockPos.z)
+                                : getSphericalDistance(blockPos.x, blockPos.y, blockPos.z);
                         if ((LIMIT == -1 || blocksHarvested <= LIMIT) && (MAX_DISTANCE == -1 || distance <= MAX_DISTANCE))
                         {
                             if (enableDrops)
@@ -105,7 +107,6 @@ public class BlockBreaker
                                         player.destroyCurrentEquippedItem();
                                         tool = null;
                                         scheduledBlocks.clear();
-                                        return;
                                     }
                                 }
                             }
@@ -116,8 +117,13 @@ public class BlockBreaker
                                 world.removeBlockTileEntity(blockPos.x, blockPos.y, blockPos.z);
                             world.setBlock(blockPos.x, blockPos.y, blockPos.z, 0, 0, 3);
                             
-                            if (!scheduledBlocks.contains(blockPos))
-                                scheduledBlocks.add(blockPos);
+                            if ((BBSettings.allowItemDamage && tool != null) || !BBSettings.allowItemDamage)
+                            {
+                                if (!scheduledBlocks.contains(blockPos))
+                                    scheduledBlocks.add(blockPos);
+                            }
+                            else
+                                return;
                         }
                     }
                 }
@@ -188,6 +194,7 @@ public class BlockBreaker
         }
     }
     
+    @SuppressWarnings("unused")
     private int getCubicDistance(int x, int y, int z)
     {
         return Math.max(Math.abs(x - startingPos.x), Math.max(Math.abs(y - startingPos.y), Math.abs(z - startingPos.z)));
@@ -223,39 +230,9 @@ public class BlockBreaker
         return scheduledBlocks;
     }
     
-    private class BBTicker implements ITickHandler
+    private class BBTicker extends TickerBase
     {
-        private EnumSet<TickType> tickTypes = EnumSet.noneOf(TickType.class);
-        
-        public BBTicker(EnumSet<TickType> tickTypes)
-        {
-            this.tickTypes = tickTypes;
-        }
-        
         @Override
-        public void tickStart(EnumSet<TickType> tickTypes, Object... tickData)
-        {
-            tick(tickTypes, true);
-        }
-        
-        @Override
-        public void tickEnd(EnumSet<TickType> tickTypes, Object... tickData)
-        {
-            tick(tickTypes, false);
-        }
-        
-        private void tick(EnumSet<TickType> tickTypes, boolean isStart)
-        {
-            for (TickType tickType : tickTypes)
-            {
-                if (!onTick(tickType, isStart))
-                {
-                    this.tickTypes.remove(tickType);
-                    this.tickTypes.removeAll(tickType.partnerTicks());
-                }
-            }
-        }
-        
         public boolean onTick(TickType tick, boolean isStart)
         {
             if (isStart)
@@ -268,12 +245,6 @@ public class BlockBreaker
                 destroyScheduledBlocks(scheduledBlocks);
             }
             return scheduledBlocks.size() > 0;
-        }
-        
-        @Override
-        public EnumSet<TickType> ticks()
-        {
-            return this.tickTypes;
         }
         
         @Override
