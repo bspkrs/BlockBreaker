@@ -1,3 +1,6 @@
+1.6.4.r03 - 19-Dec-2013
+- updated for latest bspkrsCore
+- switched to Forge BreakEvent
 1.6.4.r02 - 21-Sep-2013
 - fixed class transformer derp
 1.6.4.r01 - 20-Sep-2013
