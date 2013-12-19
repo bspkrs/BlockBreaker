@@ -24,12 +24,5 @@ public class BBClientPacketHandler implements IPacketHandler
         {
             BBClient.instance.setServerDetected();
         }
-        //        else if (packetType == 1)
-        //        {
-        //            Class[] decodeAs = { String.class, String.class, Float.class, Float.class };
-        //            Object[] packetReadout = ForgePacketHelper.readPacketData(data, decodeAs);
-        //            BBClient.instance.onServerConfigReceived((String) packetReadout[0], (String) packetReadout[1], (Float) packetReadout[2],
-        //                    (Float) packetReadout[3]);
-        //        }
     }
 }

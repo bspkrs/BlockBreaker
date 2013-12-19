@@ -2,11 +2,10 @@ package bspkrs.blockbreaker;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.world.EnumGameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
 import bspkrs.bspkrscore.fml.bspkrsCoreMod;
 import bspkrs.util.BlockID;
 import bspkrs.util.CommonUtils;
@@ -32,14 +31,11 @@ import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 public class BlockBreakerMod
 {
     public static ModVersionChecker versionChecker;
-    private String                  versionURL      = Const.VERSION_URL + "/Minecraft/" + Const.MCVERSION + "/blockBreakerForge.version";
-    private String                  mcfTopic        = "http://www.minecraftforum.net/topic/1009577-";
+    private String                  versionURL = Const.VERSION_URL + "/Minecraft/" + Const.MCVERSION + "/blockBreakerForge.version";
+    private String                  mcfTopic   = "http://www.minecraftforum.net/topic/1009577-";
     
     @Metadata(value = "BlockBreaker")
     public static ModMetadata       metadata;
-    
-    // Gets set in the Class Transformer
-    public static boolean           isCoreModLoaded = false;
     
     @SidedProxy(clientSide = "bspkrs.blockbreaker.BBClientProxy", serverSide = "bspkrs.blockbreaker.BBCommonProxy")
     public static BBCommonProxy     proxy;
@@ -63,6 +59,7 @@ public class BlockBreakerMod
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
+        MinecraftForge.EVENT_BUS.register(new ForgeEventHandler());
         proxy.onLoad();
     }
     
@@ -116,10 +113,5 @@ public class BlockBreakerMod
                 }
             }
         }
-    }
-    
-    public static boolean isItemInWorldManagerReplaced(EntityPlayerMP player)
-    {
-        return !player.theItemInWorldManager.getClass().getSimpleName().equals(ItemInWorldManager.class.getSimpleName());
     }
 }
