@@ -1,6 +1,6 @@
 {
   "modListVersion": 2,
-  "modlist": [{
+  "modList": [{
     "modid": "BlockBreaker",
     "name": "BlockBreaker",
     "description": "When a configured block is harvested a chain reaction is initiated to break connected blocks of the same type.",
