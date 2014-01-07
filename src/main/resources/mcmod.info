@@ -1,0 +1,21 @@
+{
+  "modListVersion": 2,
+  "modlist": [{
+    "modid": "BlockBreaker",
+    "name": "BlockBreaker",
+    "description": "When a configured block is harvested a chain reaction is initiated to break connected blocks of the same type.",
+    "version": "${mod_version}",
+    "mcversion": "${minecraft_version}",
+    "url": "http://www.minecraftforum.net/topic/1009577-/",
+    "updateUrl": "",
+    "authorList": [ "DaftPVF", "bspkrs" ],
+    "credits": "Original (ConnectedDestruction) by DaftPVF",
+    "logoFile": "",
+    "screenshots": [  ],
+    "parent": "",
+    "requiredMods": [ "bspkrsCore" ],
+    "dependencies": [ "bspkrsCore" ],
+    "dependants": [  ],
+    "useDependencyInformation": "true"
+  }]
+}
